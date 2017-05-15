@@ -4,9 +4,7 @@ using namespace std;
 
 /*
 * TODO: Complete the PID class.
-  PID: proportional, integral, differential
 */
-
 
 PID::PID() {}
 
