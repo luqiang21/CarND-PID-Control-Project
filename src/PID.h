@@ -9,13 +9,14 @@ public:
   double p_error;
   double i_error;
   double d_error;
+  double last_cte;
 
   /*
   * Coefficients
-  */ 
-  double Kp;
-  double Ki;
-  double Kd;
+  */
+  double Kp_;
+  double Ki_;
+  double Kd_;
 
   /*
   * Constructor
@@ -41,6 +42,11 @@ public:
   * Calculate the total PID error.
   */
   double TotalError();
+
+  /*
+  * get feasible steer value
+  */
+  double GetSteerValue(double steer_value);
 };
 
 #endif /* PID_H */
