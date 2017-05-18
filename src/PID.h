@@ -18,6 +18,25 @@ public:
   double Ki_;
   double Kd_;
 
+  double dp_;
+  double di_;
+  double dd_;
+
+  double best_err_;
+  double total_error_;
+
+  int Kp_changed_;
+  int Kp_changed2_;
+  int Kp_changed3_;
+
+  int Ki_changed_;
+  int Ki_changed2_;
+  int Ki_changed3_;
+
+  int Kd_changed2_;
+  int Kd_changed3_;
+
+  int time_steps_;
   /*
   * Constructor
   */
@@ -46,7 +65,12 @@ public:
   /*
   * get feasible steer value
   */
-  double GetSteerValue(double steer_value);
+  double GetSteerValue();
+
+  /*
+  * Define twiddle to optimize PID parameters
+  */
+  void Twiddle();
 };
 
 #endif /* PID_H */

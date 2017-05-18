@@ -3,6 +3,8 @@
 #include "json.hpp"
 #include "PID.h"
 #include <math.h>
+#define TWIDDLE 1
+
 
 // for convenience
 using json = nlohmann::json;
@@ -63,12 +65,18 @@ int main()
           * another PID controller to control the speed!
           */
           pid.UpdateError(cte);
-          double total_error = pid.TotalError();
-          steer_value = pid.GetSteerValue(total_error);
+          steer_value = pid.GetSteerValue();
+          if(TWIDDLE == 1){
+            std::cout << "current error" << pid.total_error_ << "best error " << pid.best_err_ << std::endl;
+            std::cout << "dp, di, dd: "<< std::endl;
+            std::cout << pid.dp_ << " " << pid.di_ << " " << pid.dd_ << std::endl;
+            std::cout << "Kp, Ki, Kd: "<< std::endl;
+            std::cout << pid.Kp_ << "  " << pid.Ki_ << "   "<< pid.Kd_ << std::endl;
+            pid.Twiddle();
+          }
 
 
-          std::cout << pid.i_error << " " << pid.p_error << " " << pid.d_error << std::endl;
-          std::cout << pid.Kp_ << "  " << pid.Ki_ << "   "<< pid.Kd_ << std::endl;
+
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
 
