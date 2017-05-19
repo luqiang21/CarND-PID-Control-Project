@@ -4,6 +4,7 @@
 #include "PID.h"
 #include <math.h>
 #define TWIDDLE 1
+#define N 1000
 
 
 // for convenience
@@ -36,8 +37,8 @@ int main()
 
   PID pid;
   // TODO: Initialize the pid variable.
-  double Kp = 3;
-  double Ki = .01;
+  double Kp = 10;
+  double Ki = 0.000001;
   double Kd = .001;
   pid.Init(Kp, Ki, Kd);
 
@@ -64,28 +65,39 @@ int main()
           * NOTE: Feel free to play around with the throttle and speed. Maybe use
           * another PID controller to control the speed!
           */
-          pid.UpdateError(cte);
-          steer_value = pid.GetSteerValue();
-          if(TWIDDLE == 1){
-            std::cout << "current error" << pid.total_error_ << "best error " << pid.best_err_ << std::endl;
+
+
+          // std::cout<<"time step: " <<pid.time_steps_ <<std::endl;
+          if(TWIDDLE == 1 && pid.time_steps_ == N){
+            std::cout << "current error " << pid.total_error_ << " best error " << pid.best_err_ << std::endl;
             std::cout << "dp, di, dd: "<< std::endl;
             std::cout << pid.dp_ << " " << pid.di_ << " " << pid.dd_ << std::endl;
             std::cout << "Kp, Ki, Kd: "<< std::endl;
             std::cout << pid.Kp_ << "  " << pid.Ki_ << "   "<< pid.Kd_ << std::endl;
+            std::cout<<std::endl;
             pid.Twiddle();
-          }
 
+            pid.time_steps_ = 0;
+            pid.total_error_ = 0;
+            std::string msg = "42[\"reset\",{}]";
+            ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
+          }else{
+            pid.UpdateError(cte);
+            steer_value = pid.GetSteerValue();
+            // steer_value = 2 * (1 / (1 + exp(-steer_value))) - 1; //sigmoid
 
 
           // DEBUG
-          std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
+          // std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
           msgJson["throttle"] = 0.3;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
-          std::cout << msg << std::endl;
+          // std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
+          }
+
         }
       } else {
         // Manual driving

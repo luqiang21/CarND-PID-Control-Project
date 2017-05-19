@@ -1,4 +1,5 @@
 #include "PID.h"
+#define N 100
 
 using namespace std;
 
@@ -8,7 +9,7 @@ using namespace std;
 
 PID::PID() {
 
-  best_err_ = 1e-9;
+  best_err_ = 1e9;
 
 
   Kp_changed_ = 0;
@@ -22,7 +23,7 @@ PID::PID() {
   Kd_changed2_ = 0;
   Kd_changed3_ = 0;
 
-  time_steps_ = 0;
+
 }
 
 PID::~PID() {}
@@ -34,12 +35,15 @@ void PID::Init(double Kp, double Ki, double Kd) {
   Ki_ = Ki;
   Kd_ = Kd;
 
-  dp_ = Kp_/2;
+  dp_ = Kp_/5;
   di_ = Ki_/2;
   dd_ = Kd_/2;
 
   i_error = 0;
+  time_steps_ = 0;
+
   total_error_ = 0;
+
 }
 
 void PID::UpdateError(double cte) {
@@ -48,12 +52,15 @@ void PID::UpdateError(double cte) {
   d_error = cte - last_cte;
   last_cte = cte;
 
-  total_error_ += cte * cte;
+  if(time_steps_ > N){
+    total_error_ += cte * cte;
+  }
+  time_steps_ += 1;
+
 }
 
 double PID::TotalError() {
-  time_steps_ += 1;
-  return total_error_ / time_steps_; // compensate the number of loops
+  return total_error_ / (time_steps_ - N); // compensate the number of loops
 }
 
 double PID::GetSteerValue(){
@@ -90,25 +97,29 @@ void PID::Twiddle(){
 
       }else{
 
-        if(Kp_changed3_ == 0){
-          Kp_ -= 2 * dp_;
-          Kp_changed3_ = 1;
-          // run one time
-          return;
-        }
+          if(Kp_changed3_ == 0){
+            Kp_ -= 2 * dp_;
+            Kp_changed3_ = 1;
+            // run one time
+            return;
+          }
 
-        if(err < best_err_){
-          best_err_ = err;
-          dp_ *= 1.1;
-        }else{
-          Kp_ += dp_;
-          dp_ *= 0.9;
-        }
+          if(err < best_err_){
+            best_err_ = err;
+            dp_ *= 1.1;
+            return;
+
+          }else{
+            Kp_ += dp_;
+            dp_ *= 0.9;
+            return;
+
+          }
       }
 
-      Kp_changed_ = 1;
   }
 
+  Kp_changed_ = 1;
 
   if (Ki_changed_ == 0 && Kp_changed_ == 1){
       // Kp
@@ -136,14 +147,18 @@ void PID::Twiddle(){
         if(err < best_err_){
           best_err_ = err;
           di_ *= 1.1;
+          return;
+
         }else{
           Ki_ += di_;
           di_ *= 0.9;
+          return;
+
         }
       }
 
-      Ki_changed_ = 1;
   }
+  Ki_changed_ = 1;
 
   if (Ki_changed_ == 1 && Kp_changed_ == 1){
       // Kp
@@ -171,16 +186,25 @@ void PID::Twiddle(){
         if(err < best_err_){
           best_err_ = err;
           dd_ *= 1.1;
+          return;
+
         }else{
           Kd_ += di_;
           dd_ *= 0.9;
+          return;
+
         }
       }
 
-      Kp_changed_ = 0;
-      Ki_changed_ = 0;
   }
-
+  Kp_changed_ = 0;
+  Kp_changed2_ = 0;
+  Kp_changed3_ = 0;
+  Ki_changed_ = 0;
+  Ki_changed2_ = 0;
+  Ki_changed3_ = 0;
+  Kd_changed2_ = 0;
+  Kd_changed3_ = 0;
 
 
 }
