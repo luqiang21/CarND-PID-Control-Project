@@ -71,6 +71,11 @@ public:
   * Define twiddle to optimize PID parameters
   */
   void Twiddle();
+
+  /*
+  * reset assistant parameters in TWIDDLE
+  */
+  void Reset();
 };
 
 #endif /* PID_H */

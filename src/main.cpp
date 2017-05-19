@@ -4,7 +4,7 @@
 #include "PID.h"
 #include <math.h>
 #define TWIDDLE 1
-#define N 1000
+#define N 2000
 
 
 // for convenience
@@ -37,9 +37,9 @@ int main()
 
   PID pid;
   // TODO: Initialize the pid variable.
-  double Kp = 10;
+  double Kp = .1;
   double Ki = 0.000001;
-  double Kd = .001;
+  double Kd = 1.5;
   pid.Init(Kp, Ki, Kd);
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
@@ -69,16 +69,19 @@ int main()
 
           // std::cout<<"time step: " <<pid.time_steps_ <<std::endl;
           if(TWIDDLE == 1 && pid.time_steps_ == N){
-            std::cout << "current error " << pid.total_error_ << " best error " << pid.best_err_ << std::endl;
+            pid.Twiddle();
+
+            std::cout << "current error " << pid.total_error_  << " best error " << pid.best_err_ << std::endl;
             std::cout << "dp, di, dd: "<< std::endl;
             std::cout << pid.dp_ << " " << pid.di_ << " " << pid.dd_ << std::endl;
             std::cout << "Kp, Ki, Kd: "<< std::endl;
             std::cout << pid.Kp_ << "  " << pid.Ki_ << "   "<< pid.Kd_ << std::endl;
             std::cout<<std::endl;
-            pid.Twiddle();
+            std::cout << pid.p_error << "  "<<pid.i_error<<"  "<<pid.d_error<<std::endl;
 
             pid.time_steps_ = 0;
             pid.total_error_ = 0;
+            pid.i_error = 0;
             std::string msg = "42[\"reset\",{}]";
             ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
           }else{

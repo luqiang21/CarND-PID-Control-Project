@@ -1,7 +1,7 @@
 #include "PID.h"
-#define N 100
+#define minN 100
+#include <iostream>
 
-using namespace std;
 
 /*
 * TODO: Complete the PID class.
@@ -52,16 +52,15 @@ void PID::UpdateError(double cte) {
   d_error = cte - last_cte;
   last_cte = cte;
 
-  if(time_steps_ > N){
+  if(time_steps_ > minN){
     total_error_ += cte * cte;
   }
   time_steps_ += 1;
 
+  total_error_ /= (time_steps_ - minN);
+
 }
 
-double PID::TotalError() {
-  return total_error_ / (time_steps_ - N); // compensate the number of loops
-}
 
 double PID::GetSteerValue(){
   double steer_value = -Kp_ * p_error - Ki_ * i_error - Kd_ * d_error;
@@ -75,11 +74,17 @@ double PID::GetSteerValue(){
 }
 
 
+void PID::Reset(){
+  Kp_changed_ = 0;
+  Kp_changed2_ = 0;
+  Kp_changed3_ = 0;
+}
 
+using namespace std;
 void PID::Twiddle(){
 
   double sum_d_pid = dp_ + di_ + dd_;
-  double err = TotalError();
+  double err = total_error_;
 
   if (Kp_changed_ == 0){
       // Kp
@@ -88,30 +93,40 @@ void PID::Twiddle(){
         Kp_ += dp_;
 
         Kp_changed2_ = 1;
+        std::cout << "1st run" << std::endl;
         return;
       }
 
       if(err < best_err_){
         best_err_ = err;
         dp_ *= 1.1;
+        Reset();
+        std::cout << "better result, 1st run, end" << std::endl;
 
+        return;
       }else{
 
           if(Kp_changed3_ == 0){
             Kp_ -= 2 * dp_;
             Kp_changed3_ = 1;
             // run one time
+            std::cout << "2nd run" << std::endl;
+
             return;
           }
 
           if(err < best_err_){
             best_err_ = err;
             dp_ *= 1.1;
+            Reset();
+            std::cout << "2nd run, better result, end" << std::endl;
             return;
 
           }else{
             Kp_ += dp_;
             dp_ *= 0.9;
+            Reset();
+            std::cout << "2nd run, no better result, end" << std::endl;
             return;
 
           }
@@ -121,82 +136,82 @@ void PID::Twiddle(){
 
   Kp_changed_ = 1;
 
-  if (Ki_changed_ == 0 && Kp_changed_ == 1){
-      // Kp
-      // run one time
-      if (Ki_changed2_ == 0){
-        Ki_ += di_;
-
-        Ki_changed2_ = 1;
-        return;
-      }
-
-      if(err < best_err_){
-        best_err_ = err;
-        di_ *= 1.1;
-
-      }else{
-
-        if(Ki_changed3_ == 0){
-          Ki_ -= 2 * di_;
-          Ki_changed3_ = 1;
-          // run one time
-          return;
-        }
-
-        if(err < best_err_){
-          best_err_ = err;
-          di_ *= 1.1;
-          return;
-
-        }else{
-          Ki_ += di_;
-          di_ *= 0.9;
-          return;
-
-        }
-      }
-
-  }
-  Ki_changed_ = 1;
-
-  if (Ki_changed_ == 1 && Kp_changed_ == 1){
-      // Kp
-      // run one time
-      if (Kd_changed2_ == 0){
-        Kd_ += dd_;
-
-        Kd_changed2_ = 1;
-        return;
-      }
-
-      if(err < best_err_){
-        best_err_ = err;
-        dd_ *= 1.1;
-
-      }else{
-
-        if(Kd_changed3_ == 0){
-          Kd_ -= 2 * dd_;
-          Kd_changed3_ = 1;
-          // run one time
-          return;
-        }
-
-        if(err < best_err_){
-          best_err_ = err;
-          dd_ *= 1.1;
-          return;
-
-        }else{
-          Kd_ += di_;
-          dd_ *= 0.9;
-          return;
-
-        }
-      }
-
-  }
+  // if (Ki_changed_ == 0 && Kp_changed_ == 1){
+  //     // Kp
+  //     // run one time
+  //     if (Ki_changed2_ == 0){
+  //       Ki_ += di_;
+  //
+  //       Ki_changed2_ = 1;
+  //       return;
+  //     }
+  //
+  //     if(err < best_err_){
+  //       best_err_ = err;
+  //       di_ *= 1.1;
+  //
+  //     }else{
+  //
+  //       if(Ki_changed3_ == 0){
+  //         Ki_ -= 2 * di_;
+  //         Ki_changed3_ = 1;
+  //         // run one time
+  //         return;
+  //       }
+  //
+  //       if(err < best_err_){
+  //         best_err_ = err;
+  //         di_ *= 1.1;
+  //         return;
+  //
+  //       }else{
+  //         Ki_ += di_;
+  //         di_ *= 0.9;
+  //         return;
+  //
+  //       }
+  //     }
+  //
+  // }
+  // Ki_changed_ = 1;
+  //
+  // if (Ki_changed_ == 1 && Kp_changed_ == 1){
+  //     // Kp
+  //     // run one time
+  //     if (Kd_changed2_ == 0){
+  //       Kd_ += dd_;
+  //
+  //       Kd_changed2_ = 1;
+  //       return;
+  //     }
+  //
+  //     if(err < best_err_){
+  //       best_err_ = err;
+  //       dd_ *= 1.1;
+  //
+  //     }else{
+  //
+  //       if(Kd_changed3_ == 0){
+  //         Kd_ -= 2 * dd_;
+  //         Kd_changed3_ = 1;
+  //         // run one time
+  //         return;
+  //       }
+  //
+  //       if(err < best_err_){
+  //         best_err_ = err;
+  //         dd_ *= 1.1;
+  //         return;
+  //
+  //       }else{
+  //         Kd_ += di_;
+  //         dd_ *= 0.9;
+  //         return;
+  //
+  //       }
+  //     }
+  //
+  // }
   Kp_changed_ = 0;
   Kp_changed2_ = 0;
   Kp_changed3_ = 0;
