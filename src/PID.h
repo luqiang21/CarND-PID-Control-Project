@@ -6,10 +6,10 @@ public:
   /*
   * Errors
   */
-  double p_error;
-  double i_error;
-  double d_error;
-  double last_cte;
+  double p_error_;
+  double i_error_;
+  double d_error_;
+  double last_cte_;
 
   /*
   * Coefficients
