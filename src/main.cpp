@@ -28,8 +28,8 @@
   Every time, I used the best parameters with the lowest error as the initial values
   for next run.
 
-  I used 0,0,0 for parameters and 1,1,1 for their corresponding increments.
-  After long time, I obtained good parameters:
+  I used 0.01,0.001,1 for parameters and 1,1,1 for their corresponding increments.
+  After long time, I obtained good parameters: 0.159581  0   1.37939.
 
   By adjusting the initial values several times, I obtained the final best parameters.
 
@@ -79,11 +79,11 @@ int main()
   // pid.Init(0, 0, 0);
 
   // pid.Init(1, 0, 1.28187);
-  pid.Init(1.01, 0, 1.93797);
-
-  pid.dp_ = 1;
-  pid.di_ = 1;
-  pid.dd_ = 1;
+  // pid.Init(.01, 0.001, 1);
+  pid.Init(0.159581,  0,   1.37939 + 0.01958);
+  pid.dp_ = 0.1;
+  pid.di_ = 0.0001;
+  pid.dd_ = 0.1;
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -114,7 +114,7 @@ int main()
           // std::cout<<"time step: " <<pid.time_steps_ <<std::endl;
           // if(TWIDDLE == 1 && pid.time_steps_ == N){
 
-          if(TWIDDLE == 1 && std::abs(cte) > 2 && pid.time_steps_ > 0){
+          if(TWIDDLE == 1 && std::abs(cte) > 2.2 && pid.time_steps_ > 0){
             std::cout << "CTE is " << cte << std::endl;
             pid.Twiddle();
 

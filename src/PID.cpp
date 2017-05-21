@@ -180,7 +180,7 @@ void PID::Twiddle(){
         if(err < best_err_){
           best_err_ = err;
           di_ *= 1.1;
-          Reset();
+          // Reset();
           std::cout << "Ki, better result, end" << std::endl;
           Ki_changed_ = 1;
 
@@ -189,7 +189,7 @@ void PID::Twiddle(){
         }else{
           Ki_ += di_;
           di_ *= 0.9;
-          Reset();
+          // Reset();
           std::cout << "Ki 2nd run, no better result, end" << std::endl;
           Ki_changed_ = 1;
 
