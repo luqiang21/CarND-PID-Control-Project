@@ -29,7 +29,7 @@
   for next run.
 
   I used 0.01,0.001,1 for parameters and 1,1,1 for their corresponding increments.
-  After long time, I obtained good parameters: 0.159581  0   1.37939.
+  After long time, I obtained good parameters: 0.159581  0   1.39897.
 
   By adjusting the initial values several times, I obtained the final best parameters.
 
@@ -80,7 +80,7 @@ int main()
 
   // pid.Init(1, 0, 1.28187);
   // pid.Init(.01, 0.001, 1);
-  pid.Init(0.159581,  0,   1.37939 + 0.01958);
+  pid.Init(0.159581,  0,   1.39897);
   pid.dp_ = 0.1;
   pid.di_ = 0.0001;
   pid.dd_ = 0.1;
