@@ -7,35 +7,7 @@
 #define N 2000
 
 /*
-  From wiki:
-  P accounts for present values of the error. For example, if the error is
-  large and positive, the control output will also be large and positive.
-  I accounts for past values of the error. For example, if the current output is
-  not sufficiently strong, the integral of the error will accumulate over time,
-  and the controller will respond by applying a stronger action.
-  D accounts for possible future trends of the error, based on its current rate of change.
-
-  First time I set (Kp, Ki, Kd) to like (1, 1. 1), and apply twiddle
-  every 2000 time steps. Compute the error for 2000 time steps, and then restart.
-  The car just drive using large steering angle, and
-  immediately out of road and doing circular motion.
-
-  I observed the error for each item, I realized that the i_error is very large,
-  so I tried Ki for 0.001. This time, the car drive well for the straight road,
-  goes off the road when it is near the curve. So I decided to use 1000 time steps
-  to tune for better parameters.
-
-  Every time, I used the best parameters with the lowest error as the initial values
-  for next run.
-
-  I used 0.01,0.001,1 for parameters and 1,1,1 for their corresponding increments.
-  After long time, I obtained good parameters: 0.159581  0   1.39897.
-
-  By adjusting the initial values several times, I obtained the final best parameters.
-
-  I also observed that, if the Kp is too big, the path oscillation is to strong.
-
-
+  
 */
 
 // for convenience
