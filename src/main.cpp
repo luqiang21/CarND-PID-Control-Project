@@ -3,11 +3,11 @@
 #include "json.hpp"
 #include "PID.h"
 #include <math.h>
-#define TWIDDLE 1
+#define TWIDDLE 0//1
 #define N 2000
 
 /*
-  
+
 */
 
 // for convenience
